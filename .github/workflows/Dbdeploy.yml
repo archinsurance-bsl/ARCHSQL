@@ -33,18 +33,7 @@
           done
           echo ::set-output name=arr::${arr[@]}
         
-           $matrix = [
-            'packages' => [
-          'coding-standard',
-          'phpstan-rules',
-          ]
-          ];
-
-           foreach ($matrix['packages'] as $package) {
-            $packageDirectory = 'packages/' . $package;
-            $splitRepositoryName = $package;
-               // ... do the magic
-       }
+     
         
      # Azure logout 
      - name: logout
