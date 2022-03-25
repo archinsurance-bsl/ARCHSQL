@@ -7,36 +7,40 @@
     
  jobs:
    build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    services:
+      sql.data:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        env:
+          SA_PASSWORD: WhatAmIDoing&Wrong
+          ACCEPT_EULA: Y
+        ports:
+          - "1433:1433"
     steps:
-     - uses: actions/checkout@v1
-     - uses: azure/login@v1
-       with:
-         creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: list container images
+      run: docker ps -a
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: ./*.sql
+    - name: Build
+      run: dotnet build --no-restore
+      working-directory: ./*.sql
+    - name: Restore donettool
+      run: dotnet tool install --global dotnet-ef
+      working-directory: ./*.sql
+    - name: update database
+      run: dotnet-ef database update --no-build
+      working-directory: ./*.sql
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+      working-directory: ./*.sql
+    
+    
         
-     - uses: azure/sql-action@v1
-       with:
-        server-name: 'testdbserver.database.windows.net'
-        connection-string: '${{ secrets.AZURE_SQL_CONNECTION_STRING }}'
-        sql-file: './test_sql_script.sql'
         
-        
-     - name: array
-       id: arr
-       run: |
-          arr=()
-          for i in "$(./*.sql)"
-          do
-           
-              arr+=($i)
-          
-          done
-          echo ::set-output name=arr::${arr[@]}
-        
-     
-        
-     # Azure logout 
-     - name: logout
-       run: |
-            az logout
-            
