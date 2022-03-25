@@ -33,6 +33,15 @@
           done
           echo ::set-output name=arr::${arr[@]}
         
+           $matrix = [
+            'packages' => [
+          'coding-standard',
+          'phpstan-rules',
+          ]
+          ];
+
+  
+        
      # Azure logout 
      - name: logout
        run: |
